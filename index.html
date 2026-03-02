@@ -8,26 +8,10 @@
 <style>
 body{
   margin:0;
-  font-family: Arial, sans-serif;
-  background: linear-gradient(180deg,#2b0050,#0d001a);
+  font-family:Arial;
+  background:linear-gradient(180deg,#2b0050,#0d001a);
   color:white;
   text-align:center;
-}
-h1{ margin-top:30px; }
-
-input{
-  padding:10px;
-  border-radius:5px;
-  border:none;
-}
-
-button{
-  padding:10px 20px;
-  border:none;
-  border-radius:5px;
-  background:#7b00ff;
-  color:white;
-  cursor:pointer;
 }
 
 .grid{
@@ -92,7 +76,6 @@ const keys=[
 let scratches=0;
 let total=0;
 let currentKey=null;
-let cardsData=[];
 
 function checkKey(){
   const k=document.getElementById("keyInput").value.trim();
@@ -103,12 +86,11 @@ function checkKey(){
   }
 
   if(localStorage.getItem("used_"+k)){
-    document.getElementById("msg").innerText="Essa key já foi usada nesse navegador!";
+    document.getElementById("msg").innerText="Essa key já foi usada!";
     return;
   }
 
   currentKey=k;
-
   document.getElementById("login").style.display="none";
   document.getElementById("game").style.display="block";
   startGame();
@@ -119,30 +101,19 @@ function startGame(){
   grid.innerHTML="";
   scratches=0;
   total=0;
-  cardsData=[];
   document.getElementById("result").innerText="";
 
-  // criar 9 cartas (5 baixas reais + 4 armadilhas)
+  // 🔥 9 cartas TODAS baixas no início
   for(let i=0;i<9;i++){
-    if(i<5){
-      cardsData.push({tipo:"baixo", valor:randomBaixo()});
-    }else{
-      cardsData.push({tipo:"armadilha"});
-    }
+    createCard();
   }
-
-  cardsData.sort(()=>0.5-Math.random());
-
-  cardsData.forEach((card,index)=>{
-    createCard(card,index);
-  });
 }
 
 function randomBaixo(){
   return Math.floor(Math.random()*161)+360;
 }
 
-function createCard(data,index){
+function createCard(){
 
   const card=document.createElement("div");
   card.className="card";
@@ -186,15 +157,7 @@ function createCard(data,index){
       canvas.remove();
       scratches++;
 
-      let valor;
-
-      if(data.tipo==="baixo"){
-        valor=data.valor;
-      }else{
-        // 🔥 se clicar numa armadilha vira valor baixo
-        valor=randomBaixo();
-      }
-
+      const valor=randomBaixo();
       valueDiv.innerHTML=valor+"K 💎";
       total+=valor;
 
@@ -220,15 +183,20 @@ function finishGame(){
 
   localStorage.setItem("used_"+currentKey,"true");
 
-  // revelar os altos
+  // 🔥 agora sim cria os altos (só no final)
   const altos=["5M 💎","12M 💎","25M 💎","45M 💎"];
-  let cards=document.querySelectorAll(".value");
 
+  const values=document.querySelectorAll(".value");
   let count=0;
-  cards.forEach(v=>{
+
+  values.forEach(v=>{
     if(v.innerHTML==="?"){
-      v.innerHTML=altos[count];
-      count++;
+      if(count<4){
+        v.innerHTML=altos[count];
+        count++;
+      }else{
+        v.innerHTML=randomBaixo()+"K 💎";
+      }
     }
   });
 
