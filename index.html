@@ -38,6 +38,7 @@ body{
   display:flex;
   align-items:center;
   justify-content:center;
+  font-weight:bold;
 }
 
 canvas{
@@ -103,7 +104,6 @@ function startGame(){
   total=0;
   document.getElementById("result").innerText="";
 
-  // 🔥 9 cartas TODAS baixas no início
   for(let i=0;i<9;i++){
     createCard();
   }
@@ -183,17 +183,19 @@ function finishGame(){
 
   localStorage.setItem("used_"+currentKey,"true");
 
-  // 🔥 agora sim cria os altos (só no final)
   const altos=["5M 💎","12M 💎","25M 💎","45M 💎"];
-
   const values=document.querySelectorAll(".value");
-  let count=0;
+  const canvases=document.querySelectorAll("canvas");
+
+  canvases.forEach(c=>c.remove());
+
+  let countAlto=0;
 
   values.forEach(v=>{
     if(v.innerHTML==="?"){
-      if(count<4){
-        v.innerHTML=altos[count];
-        count++;
+      if(countAlto<4){
+        v.innerHTML=altos[countAlto];
+        countAlto++;
       }else{
         v.innerHTML=randomBaixo()+"K 💎";
       }
