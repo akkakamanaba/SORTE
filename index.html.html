@@ -1,0 +1,216 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DEATH STORE - Raspadinha</title>
+
+<style>
+body{
+  margin:0;
+  background: radial-gradient(circle at top,#3a0066,#0d001a);
+  font-family: Arial, sans-serif;
+  text-align:center;
+  color:#fff;
+}
+
+h1{
+  margin-top:20px;
+  letter-spacing:3px;
+  text-shadow:0 0 15px #a020f0;
+}
+
+input{
+  padding:10px;
+  border:none;
+  border-radius:6px;
+  margin:10px;
+  width:220px;
+}
+
+button{
+  padding:10px 20px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+  background:#a020f0;
+  color:white;
+  font-weight:bold;
+  box-shadow:0 0 15px #a020f0;
+}
+
+#game{ display:none; }
+
+.grid{
+  display:grid;
+  grid-template-columns: repeat(3,110px);
+  gap:15px;
+  justify-content:center;
+  margin-top:30px;
+}
+
+.card{
+  position:relative;
+  width:110px;
+  height:110px;
+  border-radius:12px;
+  overflow:hidden;
+  box-shadow:0 0 20px #6a00ff;
+}
+
+.prize{
+  position:absolute;
+  width:100%;
+  height:100%;
+  background:#111;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:bold;
+  font-size:14px;
+}
+
+canvas{
+  position:absolute;
+  top:0;
+  left:0;
+  touch-action:none;
+}
+</style>
+</head>
+<body>
+
+<h1>DEATH STORE 💀 RASPADINHA</h1>
+
+<div id="login">
+<input type="text" id="keyInput" placeholder="Digite sua key">
+<button onclick="checkKey()">ENTRAR</button>
+<p id="msg"></p>
+</div>
+
+<div id="game">
+<p>Você pode raspar apenas 3 quadrados!</p>
+<div class="grid" id="grid"></div>
+<p id="result"></p>
+</div>
+
+<script>
+
+const keys = [
+"DS-1A2B","DS-3C4D","DS-5E6F","DS-7G8H","DS-9I0J",
+"DS-K1L2","DS-M3N4","DS-O5P6","DS-Q7R8","DS-S9T0",
+"DS-U1V2","DS-W3X4","DS-Y5Z6","DS-112A","DS-334B",
+"DS-556C","DS-778D","DS-990E","DS-AB12","DS-CD34"
+];
+
+let scratches = 0;
+let totalGems = 0;
+
+function checkKey(){
+  const input = document.getElementById("keyInput").value.trim();
+
+  if(!keys.includes(input)){
+    document.getElementById("msg").innerText="Key inválida!";
+    return;
+  }
+
+  if(localStorage.getItem(input)){
+    document.getElementById("msg").innerText="Key já usada!";
+    return;
+  }
+
+  localStorage.setItem(input,"usada");
+
+  document.getElementById("login").style.display="none";
+  document.getElementById("game").style.display="block";
+  startGame();
+}
+
+function startGame(){
+  const grid = document.getElementById("grid");
+  grid.innerHTML="";
+  scratches=0;
+  totalGems=0;
+  document.getElementById("result").innerText="";
+
+  for(let i=0;i<6;i++){
+    createCard();
+  }
+}
+
+function createCard(){
+  const gemValue = Math.floor(Math.random()*400)+100;
+
+  const card = document.createElement("div");
+  card.className="card";
+
+  const prize = document.createElement("div");
+  prize.className="prize";
+  prize.innerHTML = gemValue+" 💎";
+
+  const canvas = document.createElement("canvas");
+  canvas.width=110;
+  canvas.height=110;
+
+  const ctx = canvas.getContext("2d");
+  ctx.fillStyle="#999";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.globalCompositeOperation="destination-out";
+
+  let revealed=false;
+  let scratching=false;
+
+  function scratch(e){
+    if(scratches>=3 || revealed || !scratching) return;
+    e.preventDefault();
+
+    const rect = canvas.getBoundingClientRect();
+    const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+    const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+
+    ctx.beginPath();
+    ctx.arc(x,y,20,0,Math.PI*2);
+    ctx.fill();
+
+    checkReveal();
+  }
+
+  function checkReveal(){
+    const pixels = ctx.getImageData(0,0,canvas.width,canvas.height).data;
+    let count=0;
+
+    for(let i=3;i<pixels.length;i+=40){
+      if(pixels[i]===0) count++;
+    }
+
+    if(count>300){
+      revealed=true;
+      canvas.remove();
+      scratches++;
+      totalGems+=gemValue;
+
+      if(scratches===3){
+        document.getElementById("result").innerText =
+        "VOCÊ GANHOU "+totalGems+" GEMAS 💎";
+      }
+    }
+  }
+
+  canvas.addEventListener("mousedown",()=>scratching=true);
+  canvas.addEventListener("mouseup",()=>scratching=false);
+  canvas.addEventListener("mousemove",scratch);
+
+  canvas.addEventListener("touchstart",()=>scratching=true);
+  canvas.addEventListener("touchend",()=>scratching=false);
+  canvas.addEventListener("touchmove",scratch);
+
+  card.appendChild(prize);
+  card.appendChild(canvas);
+  document.getElementById("grid").appendChild(card);
+}
+
+</script>
+
+</body>
+</html>
