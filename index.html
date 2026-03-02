@@ -13,10 +13,8 @@ body{
   color:white;
   text-align:center;
 }
-
 h1{ margin-top:30px; }
-
-#login, #game{ margin-top:30px; }
+#login,#game{ margin-top:30px; }
 
 input{
   padding:10px;
@@ -75,20 +73,11 @@ canvas{
 </div>
 
 <script>
-const keys=[
-"DS-1A2B","DS-3C4D","DS-5E6F","DS-7G8H","DS-9I0J",
-"DS-K1L2","DS-M3N4","DS-O5P6","DS-Q7R8","DS-S9T0"
-];
 
 let scratches=0;
 let total=0;
 
 function checkKey(){
-  const k=document.getElementById("keyInput").value.trim();
-  if(!keys.includes(k)){
-    document.getElementById("msg").innerText="Key inválida";
-    return;
-  }
   document.getElementById("login").style.display="none";
   document.getElementById("game").style.display="block";
   startGame();
@@ -103,27 +92,29 @@ function startGame(){
 
   let premios=[];
 
-  // 3 ganháveis (360K a 520K)
+  // 🔥 3 valores que podem ser ganhos (360K a 520K)
   for(let i=0;i<3;i++){
-    premios.push(Math.floor(Math.random()*161)+360);
+    let valor=Math.floor(Math.random()*161)+360;
+    premios.push({valor:valor, ganhavel:true});
   }
 
-  // 6 não ganháveis (valores maiores)
-  premios.push(750);
-  premios.push(820);
-  premios.push(900);
-  premios.push(1000);
-  premios.push(1200);
-  premios.push(1500);
+  // 🔥 valores altos que nunca podem ser ganhos
+  const altos=[10000,15000,20000,25000,30000,50000]; 
+  // 10000 = 10M, 20000 = 20M etc
 
+  altos.forEach(v=>{
+    premios.push({valor:v, ganhavel:false});
+  });
+
+  // embaralhar
   premios=premios.sort(()=>0.5-Math.random());
 
-  premios.forEach(valor=>{
-    createCard(valor);
+  premios.forEach(p=>{
+    createCard(p.valor,p.ganhavel);
   });
 }
 
-function createCard(value){
+function createCard(value,ganhavel){
 
   const card=document.createElement("div");
   card.className="card";
@@ -137,7 +128,7 @@ function createCard(value){
   text.style.justifyContent="center";
 
   if(value>=1000){
-    text.innerHTML=(value/1000).toFixed(1)+"M 💎";
+    text.innerHTML=(value/1000).toFixed(0)+"M 💎";
   }else{
     text.innerHTML=value+"K 💎";
   }
@@ -177,19 +168,23 @@ function createCard(value){
       canvas.remove();
       scratches++;
 
-      // só soma se for prêmio entre 360 e 520
-      if(value>=360 && value<=520){
+      // 🔥 só soma se for ganhável
+      if(ganhavel){
         total+=value;
       }
 
       if(scratches===3){
-        document.getElementById("result").innerText=
-        "Você ganhou "+(total/1000).toFixed(2)+"M gemas";
 
-        // revelar automaticamente os outros
-        document.querySelectorAll("canvas").forEach(c=>{
-          c.remove();
-        });
+        if(total>=1000){
+          document.getElementById("result").innerText=
+          "Você ganhou "+(total/1000).toFixed(2)+"M gemas";
+        }else{
+          document.getElementById("result").innerText=
+          "Você ganhou "+total+"K gemas";
+        }
+
+        // revelar automaticamente o resto
+        document.querySelectorAll("canvas").forEach(c=>c.remove());
       }
     }
   }
@@ -197,7 +192,6 @@ function createCard(value){
   canvas.addEventListener("mousedown",()=>holding=true);
   canvas.addEventListener("mouseup",()=>holding=false);
   canvas.addEventListener("mousemove",scratch);
-
   canvas.addEventListener("touchstart",()=>holding=true);
   canvas.addEventListener("touchend",()=>holding=false);
   canvas.addEventListener("touchmove",scratch);
@@ -206,6 +200,7 @@ function createCard(value){
   card.appendChild(canvas);
   document.getElementById("grid").appendChild(card);
 }
+
 </script>
 
 </body>
