@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Death Store - Raspadinha</title>
+<title>Death Store Raspadinha</title>
 
 <style>
 
@@ -70,6 +70,11 @@ font-weight:bold;
 cursor:pointer;
 }
 
+#result{
+margin-top:20px;
+font-size:20px;
+}
+
 </style>
 </head>
 <body>
@@ -98,63 +103,42 @@ cursor:pointer;
 <script>
 
 const keys=[
-
-"DS-A1B2",
-"DS-C3D4",
-"DS-E5F6",
-"DS-G7H8",
-"DS-I9J0",
-"DS-K1L2",
-"DS-M3N4",
-"DS-O5P6",
-"DS-Q7R8",
-"DS-S9T0",
-"DS-U1V2",
-"DS-W3X4",
-"DS-Y5Z6",
-"DS-AB7C",
-"DS-DE8F"
-
+"DS-A1B2","DS-C3D4","DS-E5F6","DS-G7H8","DS-I9J0",
+"DS-K1L2","DS-M3N4","DS-O5P6","DS-Q7R8","DS-S9T0",
+"DS-U1V2","DS-W3X4","DS-Y5Z6","DS-AB7C","DS-DE8F"
 ];
 
-const premiosPossiveis=[
-
+const premiosBaixos=[
 "1M 💎",
 "1.2M 💎",
 "1.3M 💎",
 "1.4M 💎",
 "1.5M 💎"
-
 ];
 
 const premiosAltos=[
-
 "8M 💎",
 "17M 💎",
 "33M 💎",
 "45M 💎"
-
 ];
 
 let scratched=false;
 let currentKey=null;
+let premioGanho=null;
 
 function checkKey(){
 
 const k=document.getElementById("keyInput").value.trim();
 
 if(!keys.includes(k)){
-
 document.getElementById("msg").innerText="Key inválida";
 return;
-
 }
 
 if(localStorage.getItem("used_"+k)){
-
 document.getElementById("msg").innerText="Essa key já foi usada!";
 return;
-
 }
 
 currentKey=k;
@@ -172,25 +156,53 @@ const grid=document.getElementById("grid");
 
 grid.innerHTML="";
 scratched=false;
+premioGanho=null;
 
 document.getElementById("result").innerText="";
 
+let valores=[];
+
+/* escolhe posição aleatória do prêmio */
+
+const posicaoPremio=Math.floor(Math.random()*9);
+
 for(let i=0;i<9;i++){
 
-createCard();
+if(i===posicaoPremio){
+
+premioGanho=premiosBaixos[Math.floor(Math.random()*premiosBaixos.length)];
+valores.push(premioGanho);
+
+}else if(i<posicaoPremio+premiosAltos.length){
+
+valores.push(premiosAltos[i%premiosAltos.length]);
+
+}else{
+
+valores.push(premiosBaixos[Math.floor(Math.random()*premiosBaixos.length)]);
 
 }
 
 }
 
-function createCard(){
+valores.sort(()=>Math.random()-0.5);
+
+for(let i=0;i<9;i++){
+
+createCard(valores[i]);
+
+}
+
+}
+
+function createCard(valor){
 
 const card=document.createElement("div");
 card.className="card";
 
 const valueDiv=document.createElement("div");
 valueDiv.className="value";
-valueDiv.innerHTML="?";
+valueDiv.innerHTML=valor;
 
 const canvas=document.createElement("canvas");
 
@@ -227,9 +239,7 @@ const pixels=ctx.getImageData(0,0,100,100).data;
 let count=0;
 
 for(let i=3;i<pixels.length;i+=50){
-
 if(pixels[i]===0) count++;
-
 }
 
 if(count>150){
@@ -239,11 +249,7 @@ scratched=true;
 
 canvas.remove();
 
-const premio=premiosPossiveis[Math.floor(Math.random()*premiosPossiveis.length)];
-
-valueDiv.innerHTML=premio;
-
-finishGame();
+finishGame(valor);
 
 }
 
@@ -264,35 +270,16 @@ document.getElementById("grid").appendChild(card);
 
 }
 
-function finishGame(){
+function finishGame(valor){
 
 localStorage.setItem("used_"+currentKey,"true");
 
-const values=document.querySelectorAll(".value");
+const canvases=document.querySelectorAll("canvas");
 
-let altosIndex=0;
+canvases.forEach(c=>c.remove());
 
-values.forEach(v=>{
-
-if(v.innerHTML=="?"){
-
-if(altosIndex<premiosAltos.length){
-
-v.innerHTML=premiosAltos[altosIndex];
-
-altosIndex++;
-
-}else{
-
-v.innerHTML=premiosPossiveis[Math.floor(Math.random()*premiosPossiveis.length)];
-
-}
-
-}
-
-});
-
-document.getElementById("result").innerText="Prêmio revelado!";
+document.getElementById("result").innerHTML=
+"🎉 Você ganhou: <b>"+valor+"</b>";
 
 }
 
