@@ -108,8 +108,6 @@ const keys=[
 "DS-U1V2","DS-W3X4","DS-Y5Z6","DS-AB7C","DS-DE8F"
 ];
 
-/* prêmios que podem ser ganhos */
-
 const premiosGanhos=[
 "1M 💎",
 "1.2M 💎",
@@ -117,8 +115,6 @@ const premiosGanhos=[
 "1.4M 💎",
 "1.5M 💎"
 ];
-
-/* prêmios psicológicos */
 
 const premiosFake=[
 "8M 💎",
@@ -162,27 +158,21 @@ scratched=false;
 
 document.getElementById("result").innerText="";
 
-let valores=[];
-
-/* prêmio real */
+/* prêmio real que o jogador pode ganhar */
 
 const premioReal=premiosGanhos[Math.floor(Math.random()*premiosGanhos.length)];
 
-const posicaoPremio=Math.floor(Math.random()*9);
+let valores=[];
 
-/* gerar valores */
-
-for(let i=0;i<9;i++){
-
-if(i===posicaoPremio){
+/* colocar apenas 1 prêmio real */
 
 valores.push(premioReal);
 
-}else{
+/* preencher os outros */
 
-/* chance de prêmio psicológico */
+for(let i=1;i<9;i++){
 
-if(Math.random()<0.4){
+if(Math.random()<0.5){
 
 valores.push(premiosFake[Math.floor(Math.random()*premiosFake.length)]);
 
@@ -194,7 +184,9 @@ valores.push(premiosGanhos[Math.floor(Math.random()*premiosGanhos.length)]);
 
 }
 
-}
+/* embaralhar */
+
+valores.sort(()=>Math.random()-0.5);
 
 /* criar cartas */
 
