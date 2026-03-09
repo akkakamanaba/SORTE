@@ -6,47 +6,70 @@
 <title>Death Store - Raspadinha</title>
 
 <style>
+
 body{
-  margin:0;
-  font-family:Arial;
-  background:linear-gradient(180deg,#2b0050,#0d001a);
-  color:white;
-  text-align:center;
+margin:0;
+font-family:Arial;
+background:linear-gradient(180deg,#2b0050,#0d001a);
+color:white;
+text-align:center;
+}
+
+h1{
+margin-top:30px;
 }
 
 .grid{
-  margin-top:20px;
-  display:grid;
-  grid-template-columns:repeat(3,100px);
-  gap:15px;
-  justify-content:center;
+margin-top:20px;
+display:grid;
+grid-template-columns:repeat(3,100px);
+gap:15px;
+justify-content:center;
 }
 
 .card{
-  position:relative;
-  width:100px;
-  height:100px;
-  background:#111;
-  border-radius:10px;
-  overflow:hidden;
+position:relative;
+width:100px;
+height:100px;
+background:#111;
+border-radius:10px;
+overflow:hidden;
 }
 
 .value{
-  position:absolute;
-  width:100%;
-  height:100%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:bold;
+position:absolute;
+width:100%;
+height:100%;
+display:flex;
+align-items:center;
+justify-content:center;
+font-weight:bold;
+font-size:18px;
 }
 
 canvas{
-  position:absolute;
-  top:0;
-  left:0;
-  touch-action:none;
+position:absolute;
+top:0;
+left:0;
+touch-action:none;
 }
+
+input{
+padding:10px;
+border-radius:6px;
+border:none;
+}
+
+button{
+padding:10px 15px;
+border:none;
+border-radius:6px;
+background:#7a00ff;
+color:white;
+font-weight:bold;
+cursor:pointer;
+}
+
 </style>
 </head>
 <body>
@@ -54,165 +77,223 @@ canvas{
 <h1>DEATH STORE RASPADINHA</h1>
 
 <div id="login">
+
 <input id="keyInput" placeholder="Digite sua key">
 <button onclick="checkKey()">Entrar</button>
+
 <p id="msg"></p>
+
 </div>
 
 <div id="game" style="display:none;">
-<p>Raspe apenas 3 quadrados</p>
+
+<p>Raspe apenas 1 quadrado</p>
+
 <div class="grid" id="grid"></div>
+
 <p id="result"></p>
+
 </div>
 
 <script>
 
 const keys=[
-"DS-A1B2","DS-C3D4","DS-E5F6","DS-G7H8","DS-I9J0",
-"DS-K1L2","DS-M3N4","DS-O5P6","DS-Q7R8","DS-S9T0",
-"DS-U1V2","DS-W3X4","DS-Y5Z6","DS-AB7C","DS-DE8F"
+
+"DS-A1B2",
+"DS-C3D4",
+"DS-E5F6",
+"DS-G7H8",
+"DS-I9J0",
+"DS-K1L2",
+"DS-M3N4",
+"DS-O5P6",
+"DS-Q7R8",
+"DS-S9T0",
+"DS-U1V2",
+"DS-W3X4",
+"DS-Y5Z6",
+"DS-AB7C",
+"DS-DE8F"
+
 ];
 
-let scratches=0;
-let total=0;
+const premiosPossiveis=[
+
+"1M 💎",
+"1.2M 💎",
+"1.3M 💎",
+"1.4M 💎",
+"1.5M 💎"
+
+];
+
+const premiosAltos=[
+
+"8M 💎",
+"17M 💎",
+"33M 💎",
+"45M 💎"
+
+];
+
+let scratched=false;
 let currentKey=null;
 
 function checkKey(){
-  const k=document.getElementById("keyInput").value.trim();
 
-  if(!keys.includes(k)){
-    document.getElementById("msg").innerText="Key inválida";
-    return;
-  }
+const k=document.getElementById("keyInput").value.trim();
 
-  if(localStorage.getItem("used_"+k)){
-    document.getElementById("msg").innerText="Essa key já foi usada!";
-    return;
-  }
+if(!keys.includes(k)){
 
-  currentKey=k;
-  document.getElementById("login").style.display="none";
-  document.getElementById("game").style.display="block";
-  startGame();
+document.getElementById("msg").innerText="Key inválida";
+return;
+
+}
+
+if(localStorage.getItem("used_"+k)){
+
+document.getElementById("msg").innerText="Essa key já foi usada!";
+return;
+
+}
+
+currentKey=k;
+
+document.getElementById("login").style.display="none";
+document.getElementById("game").style.display="block";
+
+startGame();
+
 }
 
 function startGame(){
-  const grid=document.getElementById("grid");
-  grid.innerHTML="";
-  scratches=0;
-  total=0;
-  document.getElementById("result").innerText="";
 
-  for(let i=0;i<9;i++){
-    createCard();
-  }
+const grid=document.getElementById("grid");
+
+grid.innerHTML="";
+scratched=false;
+
+document.getElementById("result").innerText="";
+
+for(let i=0;i<9;i++){
+
+createCard();
+
 }
 
-function randomBaixo(){
-  return Math.floor(Math.random()*161)+360;
 }
 
 function createCard(){
 
-  const card=document.createElement("div");
-  card.className="card";
+const card=document.createElement("div");
+card.className="card";
 
-  const valueDiv=document.createElement("div");
-  valueDiv.className="value";
-  valueDiv.innerHTML="?";
+const valueDiv=document.createElement("div");
+valueDiv.className="value";
+valueDiv.innerHTML="?";
 
-  const canvas=document.createElement("canvas");
-  canvas.width=100;
-  canvas.height=100;
+const canvas=document.createElement("canvas");
 
-  const ctx=canvas.getContext("2d");
-  ctx.fillStyle="#999";
-  ctx.fillRect(0,0,100,100);
-  ctx.globalCompositeOperation="destination-out";
+canvas.width=100;
+canvas.height=100;
 
-  let revealed=false;
-  let holding=false;
+const ctx=canvas.getContext("2d");
 
-  function scratch(e){
-    if(!holding || revealed || scratches>=3) return;
-    e.preventDefault();
+ctx.fillStyle="#999";
+ctx.fillRect(0,0,100,100);
 
-    const rect=canvas.getBoundingClientRect();
-    const x=(e.touches?e.touches[0].clientX:e.clientX)-rect.left;
-    const y=(e.touches?e.touches[0].clientY:e.clientY)-rect.top;
+ctx.globalCompositeOperation="destination-out";
 
-    ctx.beginPath();
-    ctx.arc(x,y,15,0,Math.PI*2);
-    ctx.fill();
+let revealed=false;
+let holding=false;
 
-    const pixels=ctx.getImageData(0,0,100,100).data;
-    let count=0;
-    for(let i=3;i<pixels.length;i+=50){
-      if(pixels[i]===0) count++;
-    }
+function scratch(e){
 
-    if(count>150){
-      revealed=true;
-      canvas.remove();
-      scratches++;
+if(!holding || revealed || scratched) return;
 
-      const valor=randomBaixo();
-      valueDiv.innerHTML=valor+"K 💎";
-      total+=valor;
+e.preventDefault();
 
-      if(scratches===3){
-        finishGame();
-      }
-    }
-  }
+const rect=canvas.getBoundingClientRect();
 
-  canvas.addEventListener("mousedown",()=>holding=true);
-  canvas.addEventListener("mouseup",()=>holding=false);
-  canvas.addEventListener("mousemove",scratch);
-  canvas.addEventListener("touchstart",()=>holding=true);
-  canvas.addEventListener("touchend",()=>holding=false);
-  canvas.addEventListener("touchmove",scratch);
+const x=(e.touches?e.touches[0].clientX:e.clientX)-rect.left;
+const y=(e.touches?e.touches[0].clientY:e.clientY)-rect.top;
 
-  card.appendChild(valueDiv);
-  card.appendChild(canvas);
-  document.getElementById("grid").appendChild(card);
+ctx.beginPath();
+ctx.arc(x,y,15,0,Math.PI*2);
+ctx.fill();
+
+const pixels=ctx.getImageData(0,0,100,100).data;
+
+let count=0;
+
+for(let i=3;i<pixels.length;i+=50){
+
+if(pixels[i]===0) count++;
+
+}
+
+if(count>150){
+
+revealed=true;
+scratched=true;
+
+canvas.remove();
+
+const premio=premiosPossiveis[Math.floor(Math.random()*premiosPossiveis.length)];
+
+valueDiv.innerHTML=premio;
+
+finishGame();
+
+}
+
+}
+
+canvas.addEventListener("mousedown",()=>holding=true);
+canvas.addEventListener("mouseup",()=>holding=false);
+canvas.addEventListener("mousemove",scratch);
+
+canvas.addEventListener("touchstart",()=>holding=true);
+canvas.addEventListener("touchend",()=>holding=false);
+canvas.addEventListener("touchmove",scratch);
+
+card.appendChild(valueDiv);
+card.appendChild(canvas);
+
+document.getElementById("grid").appendChild(card);
+
 }
 
 function finishGame(){
 
-  localStorage.setItem("used_"+currentKey,"true");
+localStorage.setItem("used_"+currentKey,"true");
 
-  const altos=["8M 💎","33M 💎","17M 💎","45M 💎"];
-  const values=document.querySelectorAll(".value");
+const values=document.querySelectorAll(".value");
 
-  // remover todos os canvases restantes
-  document.querySelectorAll("canvas").forEach(c=>c.remove());
+let altosIndex=0;
 
-  let restantes=[];
+values.forEach(v=>{
 
-  values.forEach(v=>{
-    if(v.innerHTML==="?"){
-      restantes.push(v);
-    }
-  });
+if(v.innerHTML=="?"){
 
-  // garantir que temos exatamente 6 restantes
-  // colocar 4 altos primeiro
-  for(let i=0;i<restantes.length;i++){
-    if(i<4){
-      restantes[i].innerHTML=altos[i];
-    }else{
-      restantes[i].innerHTML=randomBaixo()+"K 💎";
-    }
-  }
+if(altosIndex<premiosAltos.length){
 
-  if(total>=1000){
-    document.getElementById("result").innerText=
-    "Você ganhou "+(total/1000).toFixed(2)+"M gemas";
-  }else{
-    document.getElementById("result").innerText=
-    "Você ganhou "+total+"K gemas";
-  }
+v.innerHTML=premiosAltos[altosIndex];
+
+altosIndex++;
+
+}else{
+
+v.innerHTML=premiosPossiveis[Math.floor(Math.random()*premiosPossiveis.length)];
+
+}
+
+}
+
+});
+
+document.getElementById("result").innerText="Prêmio revelado!";
+
 }
 
 </script>
