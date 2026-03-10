@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Death Store Raspadinha</title>
 
 <style>
@@ -11,17 +10,38 @@
 body{
 margin:0;
 font-family:Arial, sans-serif;
-background:linear-gradient(180deg,#1b0033,#060010);
+background:linear-gradient(180deg,#120020,#05000c);
 color:white;
 text-align:center;
+overflow-x:hidden;
 }
 
-h1{
-margin-top:30px;
-font-size:36px;
-letter-spacing:3px;
-color:#f2ccff;
+/* ===== TELA INICIAL ===== */
+
+.hero{
+padding:50px 20px;
+}
+
+.logo{
+font-size:42px;
+font-weight:bold;
+letter-spacing:4px;
+color:#e8b8ff;
 text-shadow:0 0 20px #a200ff;
+}
+
+.subtitle{
+margin-top:10px;
+opacity:0.8;
+}
+
+.loginBox{
+margin-top:30px;
+background:#140022;
+padding:25px;
+border-radius:15px;
+display:inline-block;
+box-shadow:0 0 20px #7a00ff;
 }
 
 input{
@@ -43,6 +63,12 @@ cursor:pointer;
 box-shadow:0 0 10px #8a00ff;
 }
 
+button:hover{
+transform:scale(1.05);
+}
+
+/* ===== GRID ===== */
+
 .grid{
 margin-top:30px;
 display:grid;
@@ -55,8 +81,8 @@ justify-content:center;
 position:relative;
 width:110px;
 height:110px;
-background:#140024;
-border-radius:15px;
+background:#16002b;
+border-radius:14px;
 overflow:hidden;
 box-shadow:0 0 15px #7a00ff;
 }
@@ -70,6 +96,7 @@ align-items:center;
 justify-content:center;
 font-size:18px;
 font-weight:bold;
+opacity:0;
 }
 
 canvas{
@@ -78,42 +105,67 @@ top:0;
 left:0;
 }
 
+/* ===== RESULTADO ===== */
+
 #result{
 margin-top:30px;
-font-size:24px;
-background:#140022;
-padding:20px;
-border-radius:12px;
-width:260px;
-margin-left:auto;
-margin-right:auto;
-box-shadow:0 0 20px #8a00ff;
-animation:pop 0.5s ease;
+font-size:26px;
 }
 
-@keyframes pop{
-0%{transform:scale(0.6);opacity:0;}
-100%{transform:scale(1);opacity:1;}
+/* ===== GEMAS ===== */
+
+.gem{
+animation:shine 1.5s infinite alternate;
+}
+
+@keyframes shine{
+from{filter:drop-shadow(0 0 5px #00ffd5);}
+to{filter:drop-shadow(0 0 20px #00ffd5);}
+}
+
+/* ===== CONFETE ===== */
+
+.confetti{
+position:fixed;
+width:8px;
+height:8px;
+background:red;
+top:-10px;
+animation:fall 3s linear forwards;
+}
+
+@keyframes fall{
+to{
+transform:translateY(100vh) rotate(720deg);
+opacity:0;
+}
 }
 
 </style>
 </head>
+
 <body>
 
-<h1>DEATH STORE</h1>
+<div class="hero">
 
-<div id="login">
+<div class="logo">DEATH STORE</div>
+<div class="subtitle">Raspadinha Oficial 💎</div>
 
-<p>Digite sua Key</p>
+<div class="loginBox" id="login">
+
+<p>Digite sua KEY</p>
 
 <input id="keyInput" placeholder="DS-XXXX">
+<br><br>
 <button onclick="checkKey()">ENTRAR</button>
 
 <p id="msg"></p>
 
 </div>
 
-<div id="game" style="display:none;">
+</div>
+
+<div id="game" style="display:none">
 
 <p>Raspe apenas 1 quadrado</p>
 
@@ -124,6 +176,8 @@ animation:pop 0.5s ease;
 </div>
 
 <script>
+
+/* ===== KEYS ===== */
 
 const keys={
 
@@ -154,19 +208,16 @@ const keys={
 
 };
 
-const fakeHigh=["17M 💎","33M 💎","50M 💎"];
-
-const fakeLow=[
-"1.1M 💎",
-"1.2M 💎",
-"1.3M 💎",
-"1.4M 💎",
-"1.5M 💎"
+const fakeValues=[
+"1.1M 💎","1.2M 💎","1.3M 💎","1.4M 💎","1.5M 💎",
+"17M 💎","33M 💎","50M 💎"
 ];
 
 let currentKey=null;
 let scratched=false;
 let valores=[];
+
+/* ===== LOGIN ===== */
 
 function checkKey(){
 
@@ -178,7 +229,7 @@ return;
 }
 
 if(localStorage.getItem("used_"+k)){
-document.getElementById("msg").innerText="Essa key já foi usada!";
+document.getElementById("msg").innerText="Key já usada";
 return;
 }
 
@@ -191,24 +242,18 @@ startGame();
 
 }
 
+/* ===== INICIAR ===== */
+
 function startGame(){
 
+valores=[];
+
+for(let i=0;i<9;i++){
+valores.push(fakeValues[Math.floor(Math.random()*fakeValues.length)]);
+}
+
 const grid=document.getElementById("grid");
-
 grid.innerHTML="";
-scratched=false;
-
-const premioReal=keys[currentKey];
-
-let lista=[];
-
-lista.push(...fakeHigh);
-lista.push(...fakeLow);
-lista.push(premioReal);
-
-lista=lista.sort(()=>Math.random()-0.5);
-
-valores=lista;
 
 for(let i=0;i<9;i++){
 createCard(i);
@@ -216,60 +261,42 @@ createCard(i);
 
 }
 
-function moverValorAlto(index){
-
-const premioReal=keys[currentKey];
-
-if(fakeHigh.includes(valores[index])){
-
-const valorAlto=valores[index];
-
-valores[index]=premioReal;
-
-let novo;
-
-do{
-novo=Math.floor(Math.random()*valores.length);
-}while(novo===index);
-
-valores[novo]=valorAlto;
-
-document.querySelectorAll(".value").forEach((v,i)=>{
-v.innerHTML=valores[i];
-});
-
-}
-
-}
+/* ===== CARTA ===== */
 
 function createCard(index){
 
 const card=document.createElement("div");
 card.className="card";
 
-const valueDiv=document.createElement("div");
-valueDiv.className="value";
-valueDiv.innerHTML=valores[index];
+const value=document.createElement("div");
+value.className="value";
+value.innerHTML=valores[index];
 
 const canvas=document.createElement("canvas");
-
 canvas.width=110;
 canvas.height=110;
 
 const ctx=canvas.getContext("2d");
 
-ctx.fillStyle="#bbbbbb";
+ctx.fillStyle="#999";
 ctx.fillRect(0,0,110,110);
 
 ctx.globalCompositeOperation="destination-out";
 
 let holding=false;
 
+/* som raspadinha */
+
+function playScratch(){
+const audio=new Audio("data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=");
+audio.play();
+}
+
 function scratch(e){
 
 if(!holding || scratched) return;
 
-e.preventDefault();
+playScratch();
 
 const rect=canvas.getBoundingClientRect();
 
@@ -291,10 +318,7 @@ if(pixels[i]===0) count++;
 if(count>180){
 
 scratched=true;
-
-moverValorAlto(index);
-
-finishGame();
+reveal(index);
 
 }
 
@@ -304,29 +328,67 @@ canvas.addEventListener("mousedown",()=>holding=true);
 canvas.addEventListener("mouseup",()=>holding=false);
 canvas.addEventListener("mousemove",scratch);
 
-canvas.addEventListener("touchstart",()=>holding=true,{passive:false});
+canvas.addEventListener("touchstart",()=>holding=true);
 canvas.addEventListener("touchend",()=>holding=false);
-canvas.addEventListener("touchmove",scratch,{passive:false});
+canvas.addEventListener("touchmove",scratch);
 
-card.appendChild(valueDiv);
+card.appendChild(value);
 card.appendChild(canvas);
 
 document.getElementById("grid").appendChild(card);
 
 }
 
-function finishGame(){
+/* ===== CONFETE ===== */
+
+function confetti(){
+
+for(let i=0;i<120;i++){
+
+const c=document.createElement("div");
+
+c.className="confetti";
+
+c.style.left=Math.random()*100+"vw";
+
+c.style.background=`hsl(${Math.random()*360},100%,50%)`;
+
+c.style.animationDuration=(2+Math.random()*2)+"s";
+
+document.body.appendChild(c);
+
+setTimeout(()=>c.remove(),4000);
+
+}
+
+}
+
+/* ===== REVELAR ===== */
+
+function reveal(index){
+
+valores[index]=keys[currentKey];
+
+document.querySelectorAll(".value").forEach((v,i)=>{
+
+v.innerHTML=valores[i];
+
+if(valores[i].includes("💎")){
+v.classList.add("gem");
+}
+
+v.style.opacity=1;
+
+});
+
+document.querySelectorAll("canvas").forEach(c=>c.remove());
 
 localStorage.setItem("used_"+currentKey,"true");
 
-document.querySelectorAll("canvas").forEach(c=>{
-c.remove();
-});
-
-const premio=keys[currentKey];
+confetti();
 
 document.getElementById("result").innerHTML=
-"🎉 PARABÉNS!<br><br>VOCÊ GANHOU:<br><span style='font-size:32px;color:#00ffd5;'>"+premio+"</span>";
+"🎉 VOCÊ GANHOU <b>"+keys[currentKey]+"</b>";
 
 }
 
