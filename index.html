@@ -6,7 +6,6 @@
 <title>Death Store Raspadinha</title>
 
 <style>
-
 body{
 margin:0;
 font-family:Arial;
@@ -15,9 +14,7 @@ color:white;
 text-align:center;
 }
 
-h1{
-margin-top:30px;
-}
+h1{margin-top:30px;}
 
 .grid{
 margin-top:20px;
@@ -51,7 +48,6 @@ canvas{
 position:absolute;
 top:0;
 left:0;
-touch-action:none;
 }
 
 input{
@@ -67,14 +63,12 @@ border-radius:6px;
 background:#7a00ff;
 color:white;
 font-weight:bold;
-cursor:pointer;
 }
 
 #result{
 margin-top:20px;
 font-size:20px;
 }
-
 </style>
 </head>
 <body>
@@ -82,22 +76,15 @@ font-size:20px;
 <h1>DEATH STORE RASPADINHA</h1>
 
 <div id="login">
-
 <input id="keyInput" placeholder="Digite sua key">
 <button onclick="checkKey()">Entrar</button>
-
 <p id="msg"></p>
-
 </div>
 
 <div id="game" style="display:none;">
-
 <p>Raspe apenas 1 quadrado</p>
-
 <div class="grid" id="grid"></div>
-
 <p id="result"></p>
-
 </div>
 
 <script>
@@ -107,23 +94,12 @@ const keys=[
 "DS-P9C4","DS-Z6B8","DS-X3D7","DS-J1V5","DS-A8S2"
 ];
 
-const premiosBaixos=[
-"1M 💎",
-"1.2M 💎",
-"1.3M 💎",
-"1.4M 💎",
-"1.5M 💎"
-];
-
-const premiosAltos=[
-"8M 💎",
-"17M 💎",
-"33M 💎",
-"45M 💎"
-];
+const premiosBaixos=["1M 💎","1.2M 💎","1.3M 💎","1.4M 💎","1.5M 💎"];
+const premiosAltos=["8M 💎","17M 💎","33M 💎","45M 💎"];
 
 let scratched=false;
 let currentKey=null;
+let valores=[];
 
 function checkKey(){
 
@@ -145,7 +121,6 @@ document.getElementById("login").style.display="none";
 document.getElementById("game").style.display="block";
 
 startGame();
-
 }
 
 function startGame(){
@@ -154,23 +129,42 @@ const grid=document.getElementById("grid");
 
 grid.innerHTML="";
 scratched=false;
+valores=[];
 
-document.getElementById("result").innerText="";
+/* posição do prêmio real */
+
+const posicaoReal=Math.floor(Math.random()*9);
+
+/* gerar valores */
 
 for(let i=0;i<9;i++){
-createCard();
+
+if(i===posicaoReal){
+
+valores.push(premiosBaixos[Math.floor(Math.random()*premiosBaixos.length)]);
+
+}else{
+
+valores.push(premiosAltos[Math.floor(Math.random()*premiosAltos.length)]);
+
+}
+
+}
+
+for(let i=0;i<9;i++){
+createCard(i);
 }
 
 }
 
-function createCard(){
+function createCard(index){
 
 const card=document.createElement("div");
 card.className="card";
 
 const valueDiv=document.createElement("div");
 valueDiv.className="value";
-valueDiv.innerHTML="?";
+valueDiv.innerHTML=valores[index];
 
 const canvas=document.createElement("canvas");
 
@@ -189,8 +183,6 @@ let holding=false;
 function scratch(e){
 
 if(!holding || scratched) return;
-
-e.preventDefault();
 
 const rect=canvas.getBoundingClientRect();
 
@@ -213,11 +205,7 @@ if(count>150){
 
 scratched=true;
 
-const premioBaixo=premiosBaixos[Math.floor(Math.random()*premiosBaixos.length)];
-
-valueDiv.innerHTML=premioBaixo;
-
-finishGame(premioBaixo);
+finishGame(index);
 
 }
 
@@ -235,35 +223,20 @@ card.appendChild(valueDiv);
 card.appendChild(canvas);
 
 document.getElementById("grid").appendChild(card);
-
 }
 
-function finishGame(valor){
+function finishGame(index){
 
 localStorage.setItem("used_"+currentKey,"true");
 
-/* revelar todos */
+/* remover todos os canvas para revelar */
 
-const cards=document.querySelectorAll(".value");
-
-cards.forEach(c=>{
-
-if(c.innerHTML=="?"){
-c.innerHTML=premiosAltos[Math.floor(Math.random()*premiosAltos.length)];
-}
-
-});
-
-/* remover raspagem */
-
-const canvases=document.querySelectorAll("canvas");
-
-canvases.forEach(c=>{
+document.querySelectorAll("canvas").forEach(c=>{
 c.remove();
 });
 
 document.getElementById("result").innerHTML=
-"🎉 Você ganhou: <b>"+valor+"</b>";
+"🎉 Você ganhou: <b>"+valores[index]+"</b>";
 
 }
 
