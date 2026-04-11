@@ -1,397 +1,330 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Death Store Raspadinha</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Death Store | Raspadinha Premium</title>
 
-<style>
+    <style>
+        :root {
+            --primary-red: #ff0000;
+            --dark-red: #7a0000;
+            --bg-black: #0a0a0a;
+            --card-bg: #1a1a1a;
+            --glow: 0 0 15px rgba(255, 0, 0, 0.6);
+        }
 
-body{
-margin:0;
-font-family:Arial, sans-serif;
-background:linear-gradient(180deg,#120020,#05000c);
-color:white;
-text-align:center;
-overflow-x:hidden;
-}
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: radial-gradient(circle at center, #2b0000 0%, #050505 100%);
+            color: white;
+            text-align: center;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
 
-/* ===== TELA INICIAL ===== */
+        /* ===== TELA INICIAL ===== */
+        .hero {
+            padding: 60px 20px;
+        }
 
-.hero{
-padding:50px 20px;
-}
+        .logo {
+            font-size: 48px;
+            font-weight: 900;
+            letter-spacing: 6px;
+            color: var(--primary-red);
+            text-shadow: 0 0 25px var(--primary-red);
+            margin-bottom: 5px;
+        }
 
-.logo{
-font-size:42px;
-font-weight:bold;
-letter-spacing:4px;
-color:#e8b8ff;
-text-shadow:0 0 20px #a200ff;
-}
+        .subtitle {
+            margin-top: 10px;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0.7;
+        }
 
-.subtitle{
-margin-top:10px;
-opacity:0.8;
-}
+        .loginBox {
+            margin-top: 40px;
+            background: rgba(20, 0, 0, 0.6);
+            padding: 35px;
+            border-radius: 20px;
+            display: inline-block;
+            box-shadow: var(--glow);
+            border: 1px solid rgba(255, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+        }
 
-.loginBox{
-margin-top:30px;
-background:#140022;
-padding:25px;
-border-radius:15px;
-display:inline-block;
-box-shadow:0 0 20px #7a00ff;
-}
+        .loginBox p {
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
 
-input{
-padding:12px;
-border:none;
-border-radius:8px;
-width:200px;
-margin-top:10px;
-}
+        input {
+            padding: 14px;
+            border: 1px solid #333;
+            border-radius: 8px;
+            width: 240px;
+            background: #000;
+            color: white;
+            text-align: center;
+            font-size: 1rem;
+            outline: none;
+            transition: 0.3s;
+        }
 
-button{
-padding:12px 18px;
-border:none;
-border-radius:8px;
-background:#8a00ff;
-color:white;
-font-weight:bold;
-cursor:pointer;
-box-shadow:0 0 10px #8a00ff;
-}
+        input:focus {
+            border-color: var(--primary-red);
+            box-shadow: 0 0 10px var(--primary-red);
+        }
 
-button:hover{
-transform:scale(1.05);
-}
+        button {
+            padding: 14px 30px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(45deg, var(--dark-red), var(--primary-red));
+            color: white;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(255, 0, 0, 0.3);
+        }
 
-/* ===== GRID ===== */
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px var(--primary-red);
+        }
 
-.grid{
-margin-top:30px;
-display:grid;
-grid-template-columns:repeat(3,110px);
-gap:18px;
-justify-content:center;
-}
+        /* ===== GRID DO JOGO ===== */
+        #game {
+            padding: 20px;
+            animation: fadeIn 0.5s ease-in;
+        }
 
-.card{
-position:relative;
-width:110px;
-height:110px;
-background:#16002b;
-border-radius:14px;
-overflow:hidden;
-box-shadow:0 0 15px #7a00ff;
-}
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-.value{
-position:absolute;
-width:100%;
-height:100%;
-display:flex;
-align-items:center;
-justify-content:center;
-font-size:18px;
-font-weight:bold;
-opacity:0;
-}
+        .grid {
+            margin-top: 30px;
+            display: grid;
+            grid-template-columns: repeat(3, 110px);
+            gap: 15px;
+            justify-content: center;
+        }
 
-canvas{
-position:absolute;
-top:0;
-left:0;
-}
+        .card {
+            position: relative;
+            width: 110px;
+            height: 110px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+        }
 
-/* ===== RESULTADO ===== */
+        .value {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: bold;
+            opacity: 0;
+            background: #111;
+        }
 
-#result{
-margin-top:30px;
-font-size:26px;
-}
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            cursor: crosshair;
+        }
 
-/* ===== GEMAS ===== */
+        /* ===== RESULTADO ===== */
+        #result {
+            margin-top: 30px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 0 10px var(--primary-red);
+        }
 
-.gem{
-animation:shine 1.5s infinite alternate;
-}
+        #msg {
+            color: #ff4d4d;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
 
-@keyframes shine{
-from{filter:drop-shadow(0 0 5px #00ffd5);}
-to{filter:drop-shadow(0 0 20px #00ffd5);}
-}
+        /* ===== EFEITOS ===== */
+        .gem {
+            animation: shine 1.5s infinite alternate;
+            color: #fff;
+        }
 
-/* ===== CONFETE ===== */
+        @keyframes shine {
+            from { text-shadow: 0 0 5px #fff, 0 0 10px var(--primary-red); }
+            to { text-shadow: 0 0 15px #fff, 0 0 30px var(--primary-red); }
+        }
 
-.confetti{
-position:fixed;
-width:8px;
-height:8px;
-background:red;
-top:-10px;
-animation:fall 3s linear forwards;
-}
+        .confetti {
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            top: -10px;
+            z-index: 100;
+            animation: fall 3s linear forwards;
+        }
 
-@keyframes fall{
-to{
-transform:translateY(100vh) rotate(720deg);
-opacity:0;
-}
-}
+        @keyframes fall {
+            to { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
 
-</style>
+    </style>
 </head>
 
 <body>
 
 <div class="hero">
+    <div class="logo">DEATH STORE</div>
+    <div class="subtitle">Raspadinha Oficial 💎</div>
 
-<div class="logo">DEATH STORE</div>
-<div class="subtitle">Raspadinha Oficial 💎</div>
-
-<div class="loginBox" id="login">
-
-<p>Digite sua KEY</p>
-
-<input id="keyInput" placeholder="DS-XXXX">
-<br><br>
-<button onclick="checkKey()">ENTRAR</button>
-
-<p id="msg"></p>
-
-</div>
-
+    <div class="loginBox" id="login">
+        <p>AUTENTICAÇÃO DE ACESSO</p>
+        <input id="keyInput" placeholder="Digite sua KEY (DS-XXXX)">
+        <br>
+        <button onclick="checkKey()">ATIVAR KEY</button>
+        <p id="msg"></p>
+    </div>
 </div>
 
 <div id="game" style="display:none">
-
-<p>Raspe apenas 1 quadrado</p>
-
-<div class="grid" id="grid"></div>
-
-<p id="result"></p>
-
+    <p style="font-size: 1.2rem; margin-bottom: 20px;">Sua sorte está lançada! <br> <span style="color: var(--primary-red)">Raspe um quadrado para ganhar.</span></p>
+    <div class="grid" id="grid"></div>
+    <p id="result"></p>
 </div>
 
 <script>
-
-/* ===== KEYS ===== */
-
-const keys={
-
-"DS-A9K8":"1.1M 💎",
-"DS-B1L1":"1.2M 💎",
-"DS-C2P2":"1.3M 💎",
-"DS-D8T3":"1.4M 💎",
-"DS-E6X4":"1.5M 💎",
-
-"DS-F47]Q5":"1.2M 💎",
-"DS-G4M6":"1.1M 💎",
-"DS-H2Z8":"1.4M 💎",
-"DS-J3K7":"1.3M 💎",
-"DS-K1R9":"1.5M 💎",
-
-"DS-L5V1":"1.2M 💎",
-"DS-M4S2":"1.3M 💎",
-"DS-N3F3":"1.4M 💎",
-"DS-P2H4":"1.1M 💎",
-"DS-Q1Y5":"1.5M 💎",
-
-"DS-R4C6":"1.2M 💎",
-"DS-S3D7":"1.3M 💎",
-"DS-T2B8":"1.4M 💎",
-"DS-U1E9":"1.1M 💎",
-
-"DS-ULTRA40":"40M 💎"
-
-};
-
-const fakeValues=[
-"1.1M 💎","1.2M 💎","1.3M 💎","1.4M 💎","1.5M 💎",
-"17M 💎","33M 💎","50M 💎"
-];
-
-let currentKey=null;
-let scratched=false;
-let valores=[];
-
-/* ===== LOGIN ===== */
-
-function checkKey(){
-
-const k=document.getElementById("keyInput").value.trim();
-
-if(!keys[k]){
-document.getElementById("msg").innerText="Key inválida";
-return;
-}
-
-if(localStorage.getItem("used_"+k)){
-document.getElementById("msg").innerText="Key já usada";
-return;
-}
-
-currentKey=k;
-
-document.getElementById("login").style.display="none";
-document.getElementById("game").style.display="block";
-
-startGame();
-
-}
-
-/* ===== INICIAR ===== */
-
-function startGame(){
-
-valores=[];
-
-for(let i=0;i<9;i++){
-valores.push(fakeValues[Math.floor(Math.random()*fakeValues.length)]);
-}
-
-const grid=document.getElementById("grid");
-grid.innerHTML="";
-
-for(let i=0;i<9;i++){
-createCard(i);
-}
-
-}
-
-/* ===== CARTA ===== */
-
-function createCard(index){
-
-const card=document.createElement("div");
-card.className="card";
-
-const value=document.createElement("div");
-value.className="value";
-value.innerHTML=valores[index];
-
-const canvas=document.createElement("canvas");
-canvas.width=110;
-canvas.height=110;
-
-const ctx=canvas.getContext("2d");
-
-ctx.fillStyle="#999";
-ctx.fillRect(0,0,110,110);
-
-ctx.globalCompositeOperation="destination-out";
-
-let holding=false;
-
-/* som raspadinha */
-
-function playScratch(){
-const audio=new Audio("data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=");
-audio.play();
-}
-
-function scratch(e){
-
-if(!holding || scratched) return;
-
-playScratch();
-
-const rect=canvas.getBoundingClientRect();
-
-const x=(e.touches?e.touches[0].clientX:e.clientX)-rect.left;
-const y=(e.touches?e.touches[0].clientY:e.clientY)-rect.top;
-
-ctx.beginPath();
-ctx.arc(x,y,18,0,Math.PI*2);
-ctx.fill();
-
-const pixels=ctx.getImageData(0,0,110,110).data;
-
-let count=0;
-
-for(let i=3;i<pixels.length;i+=40){
-if(pixels[i]===0) count++;
-}
-
-if(count>180){
-
-scratched=true;
-reveal(index);
-
-}
-
-}
-
-canvas.addEventListener("mousedown",()=>holding=true);
-canvas.addEventListener("mouseup",()=>holding=false);
-canvas.addEventListener("mousemove",scratch);
-
-canvas.addEventListener("touchstart",()=>holding=true);
-canvas.addEventListener("touchend",()=>holding=false);
-canvas.addEventListener("touchmove",scratch);
-
-card.appendChild(value);
-card.appendChild(canvas);
-
-document.getElementById("grid").appendChild(card);
-
-}
-
-/* ===== CONFETE ===== */
-
-function confetti(){
-
-for(let i=0;i<120;i++){
-
-const c=document.createElement("div");
-
-c.className="confetti";
-
-c.style.left=Math.random()*100+"vw";
-
-c.style.background=`hsl(${Math.random()*360},100%,50%)`;
-
-c.style.animationDuration=(2+Math.random()*2)+"s";
-
-document.body.appendChild(c);
-
-setTimeout(()=>c.remove(),4000);
-
-}
-
-}
-
-/* ===== REVELAR ===== */
-
-function reveal(index){
-
-valores[index]=keys[currentKey];
-
-document.querySelectorAll(".value").forEach((v,i)=>{
-
-v.innerHTML=valores[i];
-
-if(valores[i].includes("💎")){
-v.classList.add("gem");
-}
-
-v.style.opacity=1;
-
-});
-
-document.querySelectorAll("canvas").forEach(c=>c.remove());
-
-localStorage.setItem("used_"+currentKey,"true");
-
-confetti();
-
-document.getElementById("result").innerHTML=
-"🎉 VOCÊ GANHOU <b>"+keys[currentKey]+"</b>";
-
-}
-
+    /* LÓGICA MANTIDA CONFORME ORIGINAL */
+    const keys = {
+        "DS-A9K8":"1.1M 💎", "DS-B1L1":"1.2M 💎", "DS-C2P2":"1.3M 💎", "DS-D8T3":"1.4M 💎", "DS-E6X4":"1.5M 💎",
+        "DS-F47]Q5":"1.2M 💎", "DS-G4M6":"1.1M 💎", "DS-H2Z8":"1.4M 💎", "DS-J3K7":"1.3M 💎", "DS-K1R9":"1.5M 💎",
+        "DS-L5V1":"1.2M 💎", "DS-M4S2":"1.3M 💎", "DS-N3F3":"1.4M 💎", "DS-P2H4":"1.1M 💎", "DS-Q1Y5":"1.5M 💎",
+        "DS-R4C6":"1.2M 💎", "DS-S3D7":"1.3M 💎", "DS-T2B8":"1.4M 💎", "DS-U1E9":"1.1M 💎", "DS-ULTRA40":"40M 💎"
+    };
+
+    const fakeValues = ["1.1M 💎", "1.2M 💎", "1.3M 💎", "1.4M 💎", "1.5M 💎", "17M 💎", "33M 💎", "50M 💎"];
+    let currentKey = null;
+    let scratched = false;
+    let valores = [];
+
+    function checkKey() {
+        const k = document.getElementById("keyInput").value.trim();
+        if(!keys[k]) {
+            document.getElementById("msg").innerText = "❌ Key inválida";
+            return;
+        }
+        if(localStorage.getItem("used_"+k)) {
+            document.getElementById("msg").innerText = "⚠️ Key já utilizada";
+            return;
+        }
+        currentKey = k;
+        document.getElementById("login").style.display = "none";
+        document.getElementById("game").style.display = "block";
+        startGame();
+    }
+
+    function startGame() {
+        valores = [];
+        for(let i=0; i<9; i++) {
+            valores.push(fakeValues[Math.floor(Math.random()*fakeValues.length)]);
+        }
+        const grid = document.getElementById("grid");
+        grid.innerHTML = "";
+        for(let i=0; i<9; i++) { createCard(i); }
+    }
+
+    function createCard(index) {
+        const card = document.createElement("div");
+        card.className = "card";
+        const value = document.createElement("div");
+        value.className = "value";
+        value.innerHTML = valores[index];
+        const canvas = document.createElement("canvas");
+        canvas.width = 110; canvas.height = 110;
+        const ctx = canvas.getContext("2d");
+
+        // Cor da camada de raspagem moderna (Cinza Escuro Metálico)
+        ctx.fillStyle = "#333";
+        ctx.fillRect(0, 0, 110, 110);
+        // Adiciona um padrão visual na raspagem
+        ctx.strokeStyle = "#444";
+        for(let i=0; i<110; i+=10) {
+            ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, 110); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(110, i); ctx.stroke();
+        }
+
+        ctx.globalCompositeOperation = "destination-out";
+        let holding = false;
+
+        function scratch(e) {
+            if(!holding || scratched) return;
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+            const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+            ctx.beginPath();
+            ctx.arc(x, y, 18, 0, Math.PI * 2);
+            ctx.fill();
+            const pixels = ctx.getImageData(0, 0, 110, 110).data;
+            let count = 0;
+            for(let i=3; i<pixels.length; i+=40) { if(pixels[i] === 0) count++; }
+            if(count > 180) { scratched = true; reveal(index); }
+        }
+
+        canvas.addEventListener("mousedown", () => holding = true);
+        window.addEventListener("mouseup", () => holding = false);
+        canvas.addEventListener("mousemove", scratch);
+        canvas.addEventListener("touchstart", () => holding = true);
+        canvas.addEventListener("touchend", () => holding = false);
+        canvas.addEventListener("touchmove", scratch);
+
+        card.appendChild(value);
+        card.appendChild(canvas);
+        document.getElementById("grid").appendChild(card);
+    }
+
+    function confetti() {
+        for(let i=0; i<100; i++) {
+            const c = document.createElement("div");
+            c.className = "confetti";
+            c.style.left = Math.random() * 100 + "vw";
+            c.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
+            c.style.animationDuration = (2 + Math.random() * 2) + "s";
+            document.body.appendChild(c);
+            setTimeout(() => c.remove(), 4000);
+        }
+    }
+
+    function reveal(index) {
+        valores[index] = keys[currentKey];
+        document.querySelectorAll(".value").forEach((v, i) => {
+            v.innerHTML = valores[i];
+            if(valores[i].includes("💎")) v.classList.add("gem");
+            v.style.opacity = 1;
+        });
+        document.querySelectorAll("canvas").forEach(c => c.remove());
+        localStorage.setItem("used_" + currentKey, "true");
+        confetti();
+        document.getElementById("result").innerHTML = "🎉 VOCÊ GANHOU: <span style='color:var(--primary-red)'>" + keys[currentKey] + "</span>";
+    }
 </script>
 
 </body>
